@@ -1,5 +1,5 @@
 ## The human way to `mongodump` and `mongorestore` your MongoDB Atlas cluster. 
-### Extending the [mongodb-atlas-backup](https://github.com/kysely/mongodb-atlas-backup credit:kysely) package to make it more configuration driven
+### Extending the [mongodb-atlas-backup](https://github.com/kysely/mongodb-atlas-backup "credit:kysely") package to make it more configuration driven
 
 ## Improvements
 * Configuration parameters -
