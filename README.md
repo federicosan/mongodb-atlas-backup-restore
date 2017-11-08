@@ -1,22 +1,23 @@
-#### The human way to `mongodump` and `mongorestore` your MongoDB Atlas cluster. Extending the mongodb-atlas-backup(https://github.com/kysely/mongodb-atlas-backup) package to make it
-more configuration driven
+## The human way to `mongodump` and `mongorestore` your MongoDB Atlas cluster. 
+### Extending the [mongodb-atlas-backup](https://github.com/kysely/mongodb-atlas-backup "credit:kysely") package to make it more configuration driven
 
 ## Improvements
-Configuration driven -
-#mongodump - dump to specific directory
-#skip a process if you dont want to - using skip flag
-#promisified the whole process - get the whole dump and than restore it to new server(localhost/atlascluster)
-#for atlascluster restoration - use the same object as the dump with proper credentials. "host" is for other db connection
-#proper logs to get to know the progress
+* Configuration parameters -
++ mongodump - dump to specific directory. create the directory if it doesn't exist
++ skip a process(*lets say only mongorestore not mongodump and vice-versa*). __skip = 1 to skip it__
++ __Promisified the whole process__ - get the full mongodump and than restore it to new server(localhost/atlascluster)
++ for atlascluster restoration - use the same config object as the atlas_connection with proper credentials. "host" is for other db connection
++ proper logs to get to know the progress
++ config.js in the src/config folder contains the default configuration if you want to set it once and not pass it as an argument to the MongoBackup constructor
 
-## Install
-```sh
+### Install
+```js
 npm install
 npm start
 ```
 
-## Setup & Use
-```js
+### Setup & Use
+```javascript
 import MongoBackup from './src/index'
 
 // Create an instance of the database atlas_connection
@@ -58,3 +59,5 @@ const backup = new MongoBackup(
         process.exit(0)
     });
 ```
+
+> sample.js contains the example for the using it. Can be improved further in terms of making the further more configurable to support more mongodump/mongorestore parameters
