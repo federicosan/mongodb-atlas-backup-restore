@@ -9,19 +9,20 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/kysely/mongodb-atlas-backup"
+    "url": "https://github.com/omfd/mongodb-atlas-backup-restore"
   },
   "keywords": [
     "mongodb",
     "atlas",
     "mongo",
     "mongodump",
-    "mongorestore"
+    "mongorestore",
+    "mongoose"
   ],
-  "author": "Radek Kysely",
+  "author": "omfd",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/kysely/mongodb-atlas-backup/issues"
+    "url": "https://github.com/omfd/mongodb-atlas-backup-restore"
   },
   "devDependencies": {
     "babel-cli": "^6.24.1",
@@ -29,6 +30,7 @@
   },
   "dependencies": {
     "debug": "^3.1.0",
-    "dotenv": "^4.0.0"
+    "dotenv": "^4.0.0",
+    "mongoose": "^4.13.0"
   }
 }
