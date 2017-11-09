@@ -61,31 +61,29 @@ export default class MongoBackup {
         return new Promise((resolve, reject) => {
 
             let usrpwd = !config.restore.user ? undefined : !config.restore.password ? "" : `${config.restore.user}:${config.restore.password}@`;
-
+            let connection = "";
             if (config.restore.nodes) {
-                let connection = `mongodb://${config.restore.user}:${config.restore.password}@${config.restore.nodes.join(`,`)}`;
+                `mongodb://${config.restore.user}:${config.restore.password}@${config.restore.nodes.join(`,`)}`;
                 connection += `/${config.restore.database}?replicaSet=${config.restore.replicaSet}`;
                 connection += `&authSource=admin&ssl=true`;
                 // mongodb://cluster0-shard-00-00-abcdef.mongodb.net:27017,cluster0-shard-00-01-abcdef.mongodb.net:27017,cluster0-shard-00-02-abcdef.mongodb.net:27017
                 // /test?replicaSet=Cluster0-shard-0" --authenticationDatabase admin --ssl --username omfd --password <password>>
-
-                mongoose.connect(connection, options, (err) => {
-                    if (err) {
-                        error(err)
-                        reject(err)
-                    } else {
-                        info('Mongooose Connection Established')
-                    }
-                });
-                info(connection);
-                resolve(this);
             }
 
             if (config.restore.host) {
-                let connection = `mongodb://${!usrpwd ? "" : usrpwd }${config.restore.host}:${config.restore.port || 27017}`;
-                info(connection);
-                resolve(this);
+                connection = `mongodb://${!usrpwd ? "" : usrpwd }${config.restore.host}:${config.restore.port || 27017}`;
             }
+
+            mongoose.connect(connection, options, (err) => {
+                if (err) {
+                    error(err);
+                    reject(err)
+                } else {
+                    info('Mongooose Connection Established');
+                    info(connection);
+                    resolve(this);
+                }
+            });
         });
     }
 
