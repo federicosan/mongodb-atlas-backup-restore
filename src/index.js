@@ -63,7 +63,7 @@ export default class MongoBackup {
             let usrpwd = !config.restore.user ? undefined : !config.restore.password ? "" : `${config.restore.user}:${config.restore.password}@`;
             let connection = "";
             if (config.restore.nodes) {
-                `mongodb://${config.restore.user}:${config.restore.password}@${config.restore.nodes.join(`,`)}`;
+                connection += `mongodb://${config.restore.user}:${config.restore.password}@${config.restore.nodes.join(`,`)}`;
                 connection += `/${config.restore.database}?replicaSet=${config.restore.replicaSet}`;
                 connection += `&authSource=admin&ssl=true`;
                 // mongodb://cluster0-shard-00-00-abcdef.mongodb.net:27017,cluster0-shard-00-01-abcdef.mongodb.net:27017,cluster0-shard-00-02-abcdef.mongodb.net:27017
@@ -71,7 +71,7 @@ export default class MongoBackup {
             }
 
             if (config.restore.host) {
-                connection = `mongodb://${!usrpwd ? "" : usrpwd }${config.restore.host}:${config.restore.port || 27017}`;
+                connection += `mongodb://${!usrpwd ? "" : usrpwd }${config.restore.host}:${config.restore.port || 27017}`;
             }
 
             mongoose.connect(connection, options, (err) => {
