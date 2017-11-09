@@ -1,8 +1,18 @@
 const fs = require('fs');
-import {spawn} from 'child_process'
-import {configuration} from './config'
+import {spawn} from 'child_process';
+import mongoose, {Schema} from 'mongoose';
+import {configuration} from './config';
 
 require('dotenv').config();
+
+let options = {
+    useMongoClient: true,
+    autoIndex: false, // Don't build indexes
+    reconnectTries: 5, // Never stop trying to reconnect
+    reconnectInterval: 500, // Reconnect every 500ms
+    poolSize: 10, // Maintain up to 10 socket connections
+    bufferMaxEntries: 0
+};
 
 let info = require('debug')('mongo-atlas-backup:info'),
     warn = require('debug')('mongo-atlas-backup:warn'),
@@ -16,14 +26,14 @@ export default class MongoBackup {
                 .then((res) => {
                     this.atlasArgs = res;
                     info('atlasArgs set');
-                    return this.extendArguments(config.restore, false)
+                    return this.extendArguments(config.restore, false);
                 })
                 .then((res) => {
                     this.restoreArgs = res;
                     info('restoreArgs set');
-                    this.dump = () => this.execute(true)
-                    this.restore = () => this.execute(false)
-                    resolve(this)
+                    this.dump = () => this.execute(true);
+                    this.restore = () => this.execute(false);
+                    resolve(this);
                 })
                 .catch((err) => {
                     error(err);
@@ -47,12 +57,44 @@ export default class MongoBackup {
         });
     }
 
+    checkExistingDatabase(config = configuration) {
+        return new Promise((resolve, reject) => {
+
+            let usrpwd = !config.restore.user ? undefined : !config.restore.password ? "" : `${config.restore.user}:${config.restore.password}@`;
+
+            if (config.restore.nodes) {
+                let connection = `mongodb://${config.restore.user}:${config.restore.password}@${config.restore.nodes.join(`,`)}`;
+                connection += `/${config.restore.database}?replicaSet=${config.restore.replicaSet}`;
+                connection += `&authSource=admin&ssl=true`;
+                // mongodb://cluster0-shard-00-00-abcdef.mongodb.net:27017,cluster0-shard-00-01-abcdef.mongodb.net:27017,cluster0-shard-00-02-abcdef.mongodb.net:27017
+                // /test?replicaSet=Cluster0-shard-0" --authenticationDatabase admin --ssl --username omfd --password <password>>
+
+                mongoose.connect(connection, options, (err) => {
+                    if (err) {
+                        error(err)
+                        reject(err)
+                    } else {
+                        info('Mongooose Connection Established')
+                    }
+                });
+                info(connection);
+                resolve(this);
+            }
+
+            if (config.restore.host) {
+                let connection = `mongodb://${!usrpwd ? "" : usrpwd }${config.restore.host}:${config.restore.port || 27017}`;
+                info(connection);
+                resolve(this);
+            }
+        });
+    }
+
     extendArguments(config, dump = true) {
 
         return new Promise((resolve, reject) => {
 
             if (config.skip) {
-                resolve(null)
+                resolve(null);
             }
 
             let keys = Object.keys(config);
@@ -60,11 +102,10 @@ export default class MongoBackup {
 
             if (dump) {
                 args = args.concat(['--ssl', '--authenticationDatabase', 'admin',
-                    '--excludeCollectionsWithPrefix=system'])
+                    '--excludeCollectionsWithPrefix=system']);
             } else {
                 if (config.host != 'localhost')
-                    args = args.concat(['--ssl'])
-
+                    args = args.concat(['--ssl']);
             }
 
             for (let key of keys) {
